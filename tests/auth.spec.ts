@@ -1,13 +1,13 @@
 import { test, expect } from "@playwright/test";
 import { LoginPage } from "../pages/LoginPage";
 
-test.describe("Autentikasi TesYuk!", () => {
-  test("tester berhasil login", async ({ page }) => {
+test.describe("Autentikasi ClipHub", () => {
+  test("kreator berhasil login", async ({ page }) => {
     const login = new LoginPage(page);
     await login.goto();
     await login.login(
-      process.env.E2E_EMAIL || "tester1@gmail.com",
-      process.env.E2E_PASSWORD || "password123"
+      process.env.E2E_EMAIL || "kreator@cliphub.com",
+      process.env.E2E_PASSWORD || "password"
     );
     await login.expectLoggedIn();
   });
@@ -16,9 +16,12 @@ test.describe("Autentikasi TesYuk!", () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.login(
-      process.env.E2E_EMAIL || "tester1@gmail.com",
+      process.env.E2E_EMAIL || "kreator@cliphub.com",
       "passwordsalah"
     );
-    await expect(page).toHaveURL(/login/);
+    await expect(page).toHaveURL(/\/login/);
+    await expect(
+      page.getByText(/Email atau kata sandi yang Anda masukkan tidak cocok/i)
+    ).toBeVisible();
   });
 });

@@ -1,4 +1,4 @@
-name: Playwright E2E Tests - PBL TesYuk!
+name: Playwright E2E Tests - PBL ClipHub
 
 on:
   push:
@@ -9,14 +9,14 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     services:
       mysql:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: pbl_e2e
+          MYSQL_DATABASE: cliphub_e2e
         ports:
           - 3306:3306
         options: >-
@@ -31,12 +31,12 @@ jobs:
       DB_CONNECTION: mysql
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
-      DB_DATABASE: pbl_e2e
+      DB_DATABASE: cliphub_e2e
       DB_USERNAME: root
       DB_PASSWORD: root
       PBL_URL: http://localhost:8000
-      E2E_EMAIL: ${{ secrets.E2E_EMAIL || 'tester1@gmail.com' }}
-      E2E_PASSWORD: ${{ secrets.E2E_PASSWORD || 'password123' }}
+      E2E_EMAIL: kreator@cliphub.com
+      E2E_PASSWORD: password
 
     steps:
       - name: Checkout E2E Test Repo
@@ -44,10 +44,10 @@ jobs:
         with:
           path: e2e-tests
 
-      - name: Checkout Aplikasi PBL (TesYuk!)
+      - name: Checkout Aplikasi PBL (ClipHub)
         uses: actions/checkout@v4
         with:
-          repository: FattahulAlim/e2e-pmpl-pbl
+          repository: mrayhanz/cliphub
           path: app
 
       - name: Setup PHP
@@ -80,7 +80,31 @@ jobs:
 
       - name: Migrate dan Seed Database
         working-directory: app
-        run: php artisan migrate:fresh --seed --force
+        run: |
+          if ! ls database/migrations/*campaign_participants*.php >/dev/null 2>&1; then
+            cat <<'EOF' > database/migrations/2026_06_08_111200_create_campaign_participants_table.php
+          <?php
+          use Illuminate\Database\Migrations\Migration;
+          use Illuminate\Database\Schema\Blueprint;
+          use Illuminate\Support\Facades\Schema;
+          return new class extends Migration {
+              public function up(): void {
+                  Schema::create('campaign_participants', function (Blueprint $table) {
+                      $table->id();
+                      $table->foreignId('campaign_id')->constrained()->cascadeOnDelete();
+                      $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+                      $table->timestamp('joined_at')->nullable();
+                      $table->timestamps();
+                      $table->unique(['campaign_id', 'user_id']);
+                  });
+              }
+              public function down(): void {
+                  Schema::dropIfExists('campaign_participants');
+              }
+          };
+          EOF
+          fi
+          php artisan migrate:fresh --seed --force
 
       - name: Jalankan Server Laravel (Background)
         working-directory: app

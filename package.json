@@ -1,7 +1,7 @@
 {
   "name": "e2e-pmpl-pbl",
   "version": "1.0.0",
-  "description": "Pengujian E2E Proyek PBL TesYuk! dengan Playwright",
+  "description": "Pengujian E2E Proyek PBL ClipHub dengan Playwright",
   "main": "index.js",
   "scripts": {
     "test": "playwright test",
@@ -9,7 +9,7 @@
     "test:ui": "playwright test --ui",
     "test:report": "playwright show-report"
   },
-  "keywords": ["playwright", "e2e", "pbl", "tesyuk", "pmpl"],
+  "keywords": ["playwright", "e2e", "pbl", "cliphub", "pmpl"],
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.49.0",
